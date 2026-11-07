@@ -1,5 +1,6 @@
 using BepInEx;
 using CharmCore.Api;
+using HarmonyLib;
 using UnityEngine;
 
 namespace CharmSilverFish
@@ -15,6 +16,9 @@ namespace CharmSilverFish
 
 		internal static new BepInEx.Logging.ManualLogSource Logger { get; private set; } = null!;
 
+		/// <summary>The registered charm, for the Harmony patch to reach.</summary>
+		internal static SilverFishCharm? Charm { get; private set; }
+
 		private void Awake()
 		{
 			Logger = base.Logger;
@@ -24,9 +28,9 @@ namespace CharmSilverFish
 			this.gameObject.hideFlags = HideFlags.HideAndDontSave;
 
 			// Registering binds Enabled, WearPercent, CooldownSeconds and the Debug section (DebugMode) in this mod's config file.
-			SilverFishCharm charm = new SilverFishCharm();
-			CharmsApi.Register(charm, Config);
-			this.gameObject.AddComponent<QuickCrouch>().Charm = charm;
+			Charm = new SilverFishCharm();
+			CharmsApi.Register(Charm, Config);
+			new Harmony(PluginGuid).PatchAll();
 
 			Logger.LogInfo($"{PluginName} {PluginVersion} loaded!");
 		}
