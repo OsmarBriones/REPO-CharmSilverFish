@@ -45,3 +45,12 @@ Provided by CharmCore: the `Debug.DebugMode` setting (off by default) places the
 - Looked up by exact prefab name; a game update that renames the prefab needs a mod update.
 - Not verified in game. Other mods that write `CrouchSpeed` every frame may conflict.
 - Sprint and normal walking speed are not affected.
+
+## Runtime hygiene
+
+- **References and level state:** fixed. The only remembered state is the static `applied` flag of `QuickCrouch` (a bool, not a game object). `SilverFishCharm` now overrides `OnLevelEnded` to call `QuickCrouch.Restore()`, so the flag cannot survive a level even if the charm was somehow still marked as boosting.
+- **Per-frame work:** the `PlayerController.Update` postfix returns after a few comparisons while the charm is inactive (multiplier 1, so no input maths) and allocates nothing in either state.
+- **Debug logs:** fixed. Both `LogDebug` lines in `Tick` (start and stop) are now guarded with `if (charm.DebugMode)`.
+- **Changes to the game:** ok, verified. `CrouchSpeed` is restored to `playerOriginalCrouchSpeed` when crouch-walking stops, when the charm is switched off or the valuable leaves the pocket or breaks (`OnDeactivated` calls `Restore`), and now also at level end (`OnLevelEnded`). While the game itself overrides speed the value is left to the game, as before.
+- **Static game objects and Find calls:** none. `Restore()` reads `PlayerController.instance`, which is the game's own singleton, and keeps no reference.
+- Known limit outside this mod: while the charm is active, CharmCore's `IsActive` and `CharmSetting.Value` build their host-setting key strings on each call; that is CharmCore's code and was left alone.

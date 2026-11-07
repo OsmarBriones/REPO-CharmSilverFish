@@ -23,5 +23,11 @@ namespace CharmSilverFish
 			// The power must stop at once when the valuable leaves the pocket or breaks.
 			QuickCrouch.Restore();
 		}
+
+		protected override void OnLevelEnded()
+		{
+			// The charm is already deactivated here; make sure no boost flag survives the level.
+			QuickCrouch.Restore();
+		}
 	}
 }

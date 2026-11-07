@@ -30,7 +30,10 @@ namespace CharmSilverFish
 				if (applied)
 				{
 					Restore(player);
-					charm.LogDebug("Quick Crouch stopped, speed back to normal");
+					if (charm.DebugMode)
+					{
+						charm.LogDebug("Quick Crouch stopped, speed back to normal");
+					}
 				}
 
 				return;
@@ -40,7 +43,7 @@ namespace CharmSilverFish
 			// postfix, so its value is the base; otherwise the base is the original crouch speed.
 			float baseSpeed = GameOverrides(player) ? player.CrouchSpeed : player.playerOriginalCrouchSpeed;
 			player.CrouchSpeed = baseSpeed * multiplier;
-			if (!applied)
+			if (!applied && charm.DebugMode)
 			{
 				charm.LogDebug($"Quick Crouch started: crouch speed {baseSpeed:0.##} -> {player.CrouchSpeed:0.##}");
 			}
